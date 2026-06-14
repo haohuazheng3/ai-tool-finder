@@ -1,0 +1,10 @@
+node_modules
+.next
+.git
+ingest/.venv
+ingest/__pycache__
+ingest/**/__pycache__
+*.pyc
+.env
+.env.local
+.DS_Store

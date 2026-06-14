@@ -1,0 +1,62 @@
+name: Weekly ingest
+
+# Re-crawls sources every Monday and upserts fresh tools into the database.
+# New tools land as `pending` for review in /admin; existing tools get their
+# last_checked_at refreshed. Configure the secrets below in
+# Repo → Settings → Secrets and variables → Actions.
+
+on:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max candidates to process'
+        required: false
+        default: '80'
+      status:
+        description: 'Status for new tools (pending|live)'
+        required: false
+        default: 'pending'
+
+concurrency:
+  group: weekly-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install ingest dependencies
+        run: pip install -r ingest/requirements.txt
+
+      - name: Run ingester
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-opus-4-8' }}
+          FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+          PRODUCTHUNT_TOKEN: ${{ secrets.PRODUCTHUNT_TOKEN }}
+          INGEST_MAX_PER_SOURCE: '80'
+        run: |
+          python ingest/run.py \
+            --source all \
+            --limit ${{ github.event.inputs.limit || '80' }} \
+            --status ${{ github.event.inputs.status || 'pending' }}
+
+      # Optional: refresh ISR pages immediately by triggering a Vercel deploy hook.
+      # Create a Deploy Hook in Vercel and store its URL as the secret below.
+      # (secrets can't be used directly in `if:`, so we route it through env.)
+      - name: Trigger Vercel redeploy (optional)
+        env:
+          HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+        if: ${{ env.HOOK != '' }}
+        run: curl -fsSL -X POST "$HOOK" || true
