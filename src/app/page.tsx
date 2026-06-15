@@ -23,6 +23,7 @@ export default async function HomePage() {
 
   // Fall back to the static category list so the page is useful even pre-seed.
   const categoryItems = categories.length ? categories : CATEGORIES
+  const totalTools = categories.reduce((sum, c) => sum + (c.count ?? 0), 0)
 
   return (
     <>
@@ -30,7 +31,7 @@ export default async function HomePage() {
       <section className="hero-grid border-b">
         <div className="container flex flex-col items-center gap-6 py-20 text-center">
           <Badge variant="secondary" className="gap-1.5">
-            <Sparkles className="size-3.5" /> {latest.length || 140}+ AI tools, organized by task
+            <Sparkles className="size-3.5" /> {totalTools || 140}+ AI tools, organized by task
           </Badge>
           <h1 className="max-w-3xl text-4xl font-bold tracking-tight sm:text-5xl">
             Find the right AI tool for the job
