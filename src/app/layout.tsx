@@ -19,6 +19,7 @@ export const metadata: Metadata = {
   keywords: [...SITE.keywords],
   applicationName: SITE.name,
   alternates: { canonical: '/' },
+  verification: { google: 'AenwmabhiJ1T7Op8gvBLxDhVxRUSZmPlIfOsSRZBA28' },
   openGraph: {
     type: 'website',
     siteName: SITE.name,

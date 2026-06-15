@@ -102,6 +102,19 @@ export function itemListLd(listings: { slug: string; name: string }[], name: str
   }
 }
 
+/** FAQPage JSON-LD. Pair with visible matching Q&A on the page (schema-only is ignored). */
+export function faqPageLd(faqs: { q: string; a: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+}
+
 export function websiteLd() {
   return {
     '@context': 'https://schema.org',

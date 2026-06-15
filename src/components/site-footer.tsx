@@ -52,6 +52,8 @@ export async function SiteFooter() {
           <h3 className="mb-3 text-sm font-semibold">Directory</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li><Link href="/search" className="hover:text-foreground">All AI tools</Link></li>
+            <li><Link href="/ai-tools-pricing-report" className="hover:text-foreground">AI pricing index</Link></li>
+            <li><Link href="/updates" className="hover:text-foreground">Updates</Link></li>
             <li><Link href="/submit" className="hover:text-foreground">Submit a tool</Link></li>
             <li><Link href="/advertise" className="hover:text-foreground">Get featured</Link></li>
           </ul>

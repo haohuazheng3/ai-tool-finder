@@ -2,13 +2,17 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Sparkles } from 'lucide-react'
+import { AnswerCapsule } from '@/components/answer-capsule'
 import { EmptyState } from '@/components/empty-state'
+import { FaqSection, type Faq } from '@/components/faq-section'
 import { JsonLd } from '@/components/json-ld'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { VisitButton } from '@/components/visit-button'
 import { CATEGORIES, CATEGORY_SLUGS } from '@/data/categories'
+import { getPersona } from '@/data/personas'
 import { getCategoryBySlug, getListings } from '@/lib/db/queries'
+import { getQualifyingPersonaPairs } from '@/lib/db/seo-queries'
 import { isActivelyFeatured } from '@/lib/featured'
 import { breadcrumbLd, buildMetadata, itemListLd } from '@/lib/seo'
 import { logoUrlFor } from '@/lib/utils'
@@ -49,6 +53,17 @@ export default async function BestPage({ params }: { params: { task: string } })
 
   const headline = headlineFor(params.task, category.name)
   const listings = await getListings({ categorySlug: params.task, sort: 'featured', limit: 12 })
+  const personaSlugs = (await getQualifyingPersonaPairs())
+    .filter((p) => p.task === params.task)
+    .map((p) => p.persona)
+  const top = listings[0]
+  const shortName = category.name.replace(/^AI /, '')
+  const faqs: Faq[] = listings.length
+    ? [
+        { q: `What is the best AI ${shortName.toLowerCase()} tool?`, a: top ? `${top.name} — ${top.bestFor ?? top.tagline ?? 'our top pick.'}` : '' },
+        { q: `Is there a free AI ${shortName.toLowerCase()} tool?`, a: listings.some((l) => l.hasFreeTier) ? `Yes — ${listings.filter((l) => l.hasFreeTier).slice(0, 3).map((l) => l.name).join(', ')} offer free tiers.` : 'Most options are paid; check each for a free trial.' },
+      ]
+    : []
 
   return (
     <div className="container max-w-4xl py-10">
@@ -74,6 +89,28 @@ export default async function BestPage({ params }: { params: { task: string } })
         value, and fit. Sponsored partners are marked — ranking still reflects what each tool is
         genuinely best at.
       </p>
+
+      {top && (
+        <AnswerCapsule>
+          The best AI {shortName.toLowerCase()} tool is <strong>{top.name}</strong>
+          {top.bestFor ? ` — ${top.bestFor.replace(/\.$/, '')}.` : '.'} Below are the top {listings.length},
+          ranked by capability, value, and fit, each with honest pros and cons.
+        </AnswerCapsule>
+      )}
+
+      <div className="mt-4 flex flex-wrap gap-2 text-sm">
+        <Link href={`/best/${params.task}/free`} className="rounded-full border px-3 py-1 hover:bg-accent">
+          Best free {shortName}
+        </Link>
+        {personaSlugs.map((ps) => {
+          const p = getPersona(ps)
+          return p ? (
+            <Link key={ps} href={`/best/${params.task}/for/${ps}`} className="rounded-full border px-3 py-1 hover:bg-accent">
+              For {p.label}
+            </Link>
+          ) : null
+        })}
+      </div>
 
       {listings.length === 0 ? (
         <div className="mt-8">
@@ -129,6 +166,8 @@ export default async function BestPage({ params }: { params: { task: string } })
           ))}
         </ol>
       )}
+
+      <FaqSection faqs={faqs} />
     </div>
   )
 }

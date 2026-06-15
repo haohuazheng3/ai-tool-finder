@@ -2,7 +2,9 @@ import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import type { Metadata } from 'next'
 import { Check, Globe, Sparkles, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import { AnswerCapsule } from '@/components/answer-capsule'
 import { CompareTable } from '@/components/compare-table'
+import { FaqSection, type Faq } from '@/components/faq-section'
 import { JsonLd } from '@/components/json-ld'
 import { ListingCard } from '@/components/listing-card'
 import { Markdown } from '@/components/markdown'
@@ -91,6 +93,13 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
   const featured = isActivelyFeatured(listing)
   const domain = domainFromUrl(listing.websiteUrl)
 
+  const faqs: Faq[] = [
+    { q: `What is ${listing.name}?`, a: `${listing.name} is ${(listing.tagline ?? `an AI ${listing.category?.name ?? 'tool'}`).replace(/\.$/, '')}.${listing.bestFor ? ` It's best for ${listing.bestFor.replace(/\.$/, '').toLowerCase()}.` : ''}` },
+    { q: `How much does ${listing.name} cost?`, a: listing.pricingText ?? 'See the official site for current pricing.' },
+    { q: `Does ${listing.name} have a free tier?`, a: listing.hasFreeTier ? `Yes, ${listing.name} offers a free tier or free plan.` : `${listing.name} does not offer a permanent free tier; check the site for trials.` },
+    ...(related.length >= 4 ? [{ q: `What are the best ${listing.name} alternatives?`, a: `Top alternatives include ${related.slice(0, 3).map((r) => r.name).join(', ')}. See the full comparison on our ${listing.name} alternatives page.` }] : []),
+  ]
+
   return (
     <div className="container max-w-5xl py-10">
       <JsonLd
@@ -155,6 +164,12 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
               <Badge key={t} variant="muted">{t}</Badge>
             ))}
           </div>
+
+          <AnswerCapsule>
+            <strong>{listing.name}</strong> is {(listing.tagline ?? `an AI ${listing.category?.name ?? 'tool'}`).replace(/\.$/, '')}.
+            {listing.bestFor ? ` Best for ${listing.bestFor.replace(/\.$/, '').toLowerCase()}.` : ''}{' '}
+            {listing.pricingText ? `Pricing: ${listing.pricingText}.` : ''} {listing.hasFreeTier ? 'A free tier is available.' : ''}
+          </AnswerCapsule>
 
           {listing.descriptionMd && (
             <section className="mt-8">
@@ -248,7 +263,14 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
       {/* Alternatives */}
       {related.length > 0 && (
         <section className="mt-14">
-          <h2 className="text-xl font-semibold">Alternatives to {listing.name}</h2>
+          <div className="flex items-end justify-between gap-3">
+            <h2 className="text-xl font-semibold">Alternatives to {listing.name}</h2>
+            {related.length >= 4 && (
+              <Link href={`/${listing.slug}/alternatives`} className="shrink-0 text-sm font-medium text-primary hover:underline">
+                Compare all alternatives →
+              </Link>
+            )}
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
             Other {listing.category?.name ?? 'AI'} tools worth comparing.
           </p>
@@ -267,6 +289,8 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
           </div>
         </section>
       )}
+
+      <FaqSection faqs={faqs} />
     </div>
   )
 }
