@@ -12,7 +12,7 @@ import { VisitButton } from '@/components/visit-button'
 import { CATEGORIES, CATEGORY_SLUGS } from '@/data/categories'
 import { getPersona } from '@/data/personas'
 import { getCategoryBySlug, getListings } from '@/lib/db/queries'
-import { getQualifyingPersonaPairs } from '@/lib/db/seo-queries'
+import { getQualifyingPersonaPairs, trioSlug } from '@/lib/db/seo-queries'
 import { isActivelyFeatured } from '@/lib/featured'
 import { breadcrumbLd, buildMetadata, itemListLd } from '@/lib/seo'
 import { logoUrlFor } from '@/lib/utils'
@@ -58,6 +58,18 @@ export default async function BestPage({ params }: { params: { task: string } })
     .map((p) => p.persona)
   const top = listings[0]
   const shortName = category.name.replace(/^AI /, '')
+
+  // Head-to-head trios from the top 4 — same set generated for /compare/* (canonical, alphabetical),
+  // so these links resolve without a redirect AND give those pages real internal links (no orphans).
+  const trioPool = listings.slice(0, 4)
+  const trios: { slug: string; label: string }[] = []
+  for (let i = 0; i < trioPool.length; i++)
+    for (let j = i + 1; j < trioPool.length; j++)
+      for (let k = j + 1; k < trioPool.length; k++)
+        trios.push({
+          slug: trioSlug(trioPool[i].slug, trioPool[j].slug, trioPool[k].slug),
+          label: `${trioPool[i].name} vs ${trioPool[j].name} vs ${trioPool[k].name}`,
+        })
   const faqs: Faq[] = listings.length
     ? [
         { q: `What is the best AI ${shortName.toLowerCase()} tool?`, a: top ? `${top.name} — ${top.bestFor ?? top.tagline ?? 'our top pick.'}` : '' },
@@ -77,7 +89,7 @@ export default async function BestPage({ params }: { params: { task: string } })
         ]}
       />
 
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> /{' '}
         <Link href={`/category/${params.task}`} className="hover:text-foreground">{category.name}</Link> /{' '}
         <span className="text-foreground">Best</span>
@@ -165,6 +177,21 @@ export default async function BestPage({ params }: { params: { task: string } })
             </li>
           ))}
         </ol>
+      )}
+
+      {trios.length > 0 && (
+        <section className="mt-12">
+          <h2 className="text-xl font-semibold">Compare the top {shortName.toLowerCase()} tools head-to-head</h2>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {trios.map((t) => (
+              <li key={t.slug}>
+                <Link href={`/compare/${t.slug}`} className="text-sm text-primary hover:underline">
+                  {t.label} →
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
 
       <FaqSection faqs={faqs} />

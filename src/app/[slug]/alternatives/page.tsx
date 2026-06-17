@@ -92,7 +92,7 @@ export default async function AlternativesPage({ params }: { params: { slug: str
         itemListLd(alternatives, `${listing.name} alternatives`),
       ]} />
 
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> /{' '}
         <Link href={`/${listing.slug}`} className="hover:text-foreground">{listing.name}</Link> /{' '}
         <span className="text-foreground">Alternatives</span>

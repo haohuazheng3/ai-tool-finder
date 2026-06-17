@@ -46,6 +46,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
           <input
             name="q"
             defaultValue={q}
+            aria-label="Search AI tools"
             placeholder="Search by name or task…"
             className="h-10 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           />

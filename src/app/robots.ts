@@ -8,6 +8,7 @@ const AI_BOTS = [
   'ClaudeBot', 'Claude-User', 'anthropic-ai',
   'PerplexityBot', 'Perplexity-User',
   'Google-Extended', 'Applebot-Extended', 'Bingbot', 'Amazonbot', 'cohere-ai',
+  'CCBot', 'Meta-ExternalAgent', 'Bytespider', 'Diffbot',
 ]
 
 const DISALLOW = ['/api/', '/admin', '/advertise/success']

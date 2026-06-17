@@ -72,7 +72,7 @@ export default async function BestForPersonaPage({
         itemListLd(tools, headline),
       ]} />
 
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> /{' '}
         <Link href={`/best/${params.task}`} className="hover:text-foreground">Best {cat.name}</Link> /{' '}
         <span className="text-foreground">For {persona.label}</span>

@@ -1,12 +1,12 @@
-name: Weekly GSC report
+name: Daily GSC report
 
-# Pulls Search Console data weekly and writes an action list (title fixes,
+# Pulls Search Console data daily and writes an action list (title fixes,
 # near-page-1 wins, pages to build) to the run summary. Requires the
 # GOOGLE_SERVICE_ACCOUNT_JSON secret (the SEO service account).
 
 on:
   schedule:
-    - cron: '0 7 * * 1' # Mondays 07:00 UTC
+    - cron: '0 7 * * *' # every day, 07:00 UTC
   workflow_dispatch: {}
 
 jobs:

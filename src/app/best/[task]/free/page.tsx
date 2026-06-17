@@ -61,7 +61,7 @@ export default async function BestFreePage({ params }: { params: { task: string 
         itemListLd(tools, headline),
       ]} />
 
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> /{' '}
         <Link href={`/category/${params.task}`} className="hover:text-foreground">{cat.name}</Link> /{' '}
         <span className="text-foreground">Best Free</span>

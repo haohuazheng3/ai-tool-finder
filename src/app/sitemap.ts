@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     e(base, 1, 'daily'),
     e(`${base}/ai-tools-pricing-report`, 0.8, 'weekly'),
     e(`${base}/updates`, 0.6, 'daily'),
-    e(`${base}/search`, 0.5, 'weekly'),
+    // /search is noindex (internal search results) — intentionally excluded from the sitemap.
     e(`${base}/advertise`, 0.5, 'monthly'),
     e(`${base}/submit`, 0.4, 'monthly'),
     ...catSlugs.flatMap((s) => [

@@ -56,7 +56,7 @@ export default async function PricingReportPage() {
         },
       ]} />
 
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> / <span className="text-foreground">Pricing Index</span>
       </nav>
 

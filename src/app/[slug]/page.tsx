@@ -115,7 +115,7 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
         ]}
       />
 
-      <nav className="mb-4 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link>
         {listing.category && (
           <>
@@ -307,7 +307,7 @@ function CompareView({ a, b }: { a: ListingWithCategory; b: ListingWithCategory 
           { name: `${a.name} vs ${b.name}`, path: `/${canonical}` },
         ])}
       />
-      <nav className="mb-3 text-sm text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="mb-3 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-foreground">Home</Link> /{' '}
         <span className="text-foreground">Compare</span>
       </nav>

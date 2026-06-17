@@ -115,6 +115,19 @@ export function faqPageLd(faqs: { q: string; a: string }[]) {
   }
 }
 
+/** Organization JSON-LD — sitewide entity (name, logo, url). Rendered once in the root layout. */
+export function organizationLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE.name,
+    url: env.appUrl,
+    // 180×180 PNG served by app/apple-icon.tsx — a square, crawlable raster logo.
+    logo: absoluteUrl('/apple-icon'),
+    description: SITE.description,
+  }
+}
+
 export function websiteLd() {
   return {
     '@context': 'https://schema.org',

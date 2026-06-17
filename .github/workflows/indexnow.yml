@@ -1,0 +1,23 @@
+name: IndexNow ping
+
+# Submits every sitemap URL to IndexNow (Bing/Yandex/etc.) daily and on demand.
+# No secrets needed — the IndexNow key is public and hosted at /<key>.txt.
+
+on:
+  schedule:
+    - cron: '30 7 * * *' # daily, 07:30 UTC (after the weekly ingest/refresh)
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Ping IndexNow
+        env:
+          SITE_URL: 'https://toolsbytask.com'
+        run: node scripts/indexnow-ping.mjs
