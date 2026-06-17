@@ -16,7 +16,8 @@ import fs from 'node:fs'
 
 const SITE_URL = process.env.SITE_URL || 'https://toolsbytask.com/'
 const saRaw = process.env.GOOGLE_SERVICE_ACCOUNT_JSON
-if (!saRaw) { console.error('GOOGLE_SERVICE_ACCOUNT_JSON not set'); process.exit(1) }
+  || (process.env.GOOGLE_SERVICE_ACCOUNT_B64 && Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8'))
+if (!saRaw) { console.error('Set GOOGLE_SERVICE_ACCOUNT_JSON or GOOGLE_SERVICE_ACCOUNT_B64'); process.exit(1) }
 const sa = JSON.parse(saRaw)
 
 const b64url = (x) => Buffer.from(x).toString('base64url')

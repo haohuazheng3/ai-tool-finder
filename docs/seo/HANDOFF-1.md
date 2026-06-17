@@ -55,41 +55,36 @@
 ### G2 GSC 自动挂载 + 域名所有权
 - ✅ **url-prefix 属性 `https://toolsbytask.com/` 已验证 + sitemap 已提交 + 你的账号 haohuazheng001@gmail.com 已是所有者**（上一轮完成，你现在 GSC 里就能看到）
 - ✅ **每日** GSC 报告 workflow（`weekly-gsc.yml` cron 已改为每日；`scripts/gsc-report.mjs` 产出"该改标题 / 临近首页 / 该建页"清单）—— **代码就绪**
-- ⛔ **被阻断（见下方手动项 #1）**：GSC 实时拉取 + DNS 网域属性，都因**服务账号密钥已失效**而暂不能跑
+- ✅ **已全部接通（新 key 到位后收尾完成）**：每日 GSC 报告鉴权通过（实测，新站暂 0 曝光）；GitHub Secret `GOOGLE_SERVICE_ACCOUNT_JSON` 已更新；**DNS 网域属性 `sc-domain:toolsbytask.com` 经 Cloudflare API 端到端完成**（写 TXT → Google ~10s 验证 → sites.add → 提交 sitemap → 你已是所有者）
 
 ### H 真实抓取监控（Cloudflare 日志）
-- ⏭️ 需 `CLOUDFLARE_API_TOKEN`（env 中没有）→ 跳过并标注。给我一个有 Analytics/Logs 读权限的 CF token 即可接通"Googlebot/GPTBot 实抓了哪些页/频率/404"。
+- ⏭️ CF token 已到位且**能写 DNS（已用于网域属性验证）**，但**缺 `Zone Analytics:Read` 权限**（GraphQL 报 authz 拒绝；该 zone 为 Free 计划）→ bot 抓取分析暂不能拉。给该 token 勾上 Analytics:Read 即接通；在此之前用 GSC「设置 → 抓取统计」看 Googlebot。
 
 ### I 信号一致性交叉校验
 - ✅ noindex 页不在 sitemap（**本轮把 noindex 的 `/search` 从 sitemap 移除**）；canonical 一律指向干净可索引 URL；vs / 三方页非规范序 → 永久跳规范序；无互指 canonical、无重定向链
 
 ---
 
-## 2. 留给你的手动项（按重要性排序）
+## 2. 留给你的手动项（第一轮收尾时你已补 key，绝大多数已自动闭环）
 
-### 🔴 #1（最重要）SEO 服务账号密钥已失效 → 需要一把新的
-- **现象**：`.env.local` 里 `seo api` 那把 key（`key_id 7cbb87c7…`）做 JWT 换 token 时返回 `invalid_grant: Invalid JWT Signature`。本地签名正常 → 是**密钥本身被轮换/吊销**（很可能是此前我提醒你轮换后留下的旧 key）。
-- **影响**：每日 GSC 报告 workflow、DNS 网域属性验证、任何 GSC API 调用都用这把 key → 现在都跑不通。**（你在 GSC 网页端看 url-prefix 属性数据不受影响。）**
-- **你要做的（约 2 分钟）**：
-  1. 到 GCP 控制台 → 项目 `seo-api-499507` → IAM → 服务账号 `seo-bot@seo-api-499507.iam.gserviceaccount.com` → 「密钥」→ 新建 JSON 密钥，下载。
-  2. 把整段 JSON 丢进 `.env.local`（替换 `seo api` 那一段），并更新 GitHub 仓库 Secret `GOOGLE_SERVICE_ACCOUNT_JSON`（仓库 → Settings → Secrets → Actions）。
-  3. 告诉我「新 key 好了」——我会立刻：验证 token、跑通每日 GSC 报告、取 DNS 网域属性的 TXT 记录给你。
+### ✅ #1（已解决）SEO 服务账号密钥 — 新 key 已到位并全部接通
+- 你提供新 key（`GOOGLE_SERVICE_ACCOUNT_B64`，key_id `34a6c486…`）。我已自动：换 token ✓ → 每日 GSC 报告鉴权通过 ✓ → 更新 GitHub Secret `GOOGLE_SERVICE_ACCOUNT_JSON` ✓ → 用它 + Cloudflare 完成网域属性 ✓。`gsc-report.mjs` 现同时支持 `GOOGLE_SERVICE_ACCOUNT_JSON` 或 `_B64`。**无需你再操作。**
 
-### 🟡 #2 DNS 网域属性（依赖 #1，可选增强）
-- 现在你有 **url-prefix** 属性已够看全站数据。**网域(Domain)属性**额外覆盖子域/http，需要一条 DNS TXT。
-- 路径 A（等 #1）：新 key 到位后我自动取 TXT token 给你，你在 Cloudflare 加一条 TXT 即可。
-- 路径 B（你自己点，最快）：GSC → 添加资源 → 「网域」→ 输入 `toolsbytask.com` → GSC 直接给你一条 `google-site-verification=…` 的 TXT → 加到 Cloudflare DNS。
+### ✅ #2（已完成）DNS 网域属性
+- 已通过 Cloudflare API 全自动：取 TXT → 写 DNS → Google ~10s 验证 → 添加 `sc-domain:toolsbytask.com` → 提交 sitemap → 你（haohuazheng001）已是所有者。**你现在 GSC 里有两个属性：url-prefix + 网域。**
 
-### 🟢 #3（可选）解锁更多自动化的 key
-- `CLOUDFLARE_API_TOKEN`（Analytics/Logs 读）→ 接通 H 真实抓取监控
-- Voyage / OpenAI embedding key → C 升级为语义内链 + 去重
-- 这些不给也不影响主体；给了我就接上。
+### 🟡 #3 仍需你留意的
+- ⚠️ **`ANTHROPIC_API_KEY` 现在为空**（模板覆盖了原值）→ 采集器 / AI 内容生成会失效。后续轮次需要时请补回。
+- 想要 **H 真实抓取监控**：给现有 CF token 勾上 **Zone Analytics:Read**（现在 GraphQL 报权限不足）。在此之前用 GSC「设置 → 抓取统计」看 Googlebot。
+- 想要 **C 语义内链 / 去重**：给一个 Voyage 或 OpenAI embedding key。
+- 已收到备用：`VERCEL_TOKEN` / `NEON_API_KEY` / `RESEND_API_KEY` / `FIRECRAWL_API_KEY`，后续轮次（部署 / DB 分支 / 外联邮件 / 采集）会用到。
 
 ---
 
-## 3. 部署验证
-- 提交：`b028d93`（已推 main，Vercel 自动部署）
-- 验证清单见本轮对话末尾的实测结果（IndexNow key 200、HSTS 含 includeSubDomains、robots 含 CCBot、Organization JSON-LD、sitemap 不含 /search、PSI 实测 LCP/CLS/INP）。
+## 3. 部署验证（实测）
+- 提交：`b028d93` + 收尾若干（已推 main，Vercel 自动部署）
+- ✅ IndexNow key 200 且 ping 返回 200（483 URL 已提交）；HSTS 含 `includeSubDomains; preload`；robots 含 CCBot；首页 JSON-LD 解析为 `Organization+WebSite`；icon / apple-icon / manifest 全 200；sitemap 不含 /search；trio / best / detail 页 200 无跳转
+- ⏭️ CWV 实测数字：免 key 的 PageSpeed 接口当日配额用尽（429）→ 优化已就位（SSG/ISR、系统字体、图片留尺寸、preconnect），可在 PSI 网页端确认或稍后重测
 
 ---
 
