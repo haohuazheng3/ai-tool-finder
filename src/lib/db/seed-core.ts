@@ -2,7 +2,10 @@ import { sql } from 'drizzle-orm'
 import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js'
 import { CATEGORIES } from '@/data/categories'
 import { SEED_LISTINGS } from '@/data/seed-listings'
+import { SEED_LISTINGS_EXTRA } from '@/data/seed-listings-extra'
 import { categories, listings } from './schema'
+
+const ALL_SEED = [...SEED_LISTINGS, ...SEED_LISTINGS_EXTRA]
 
 const FEATURED_WINDOW_DAYS = 60
 
@@ -42,7 +45,7 @@ export async function seedDatabase(
   const now = new Date()
   const featuredUntil = new Date(now.getTime() + FEATURED_WINDOW_DAYS * 86_400_000)
 
-  const values = SEED_LISTINGS.map((s) => ({
+  const values = ALL_SEED.map((s) => ({
     slug: s.slug,
     name: s.name,
     tagline: s.tagline,

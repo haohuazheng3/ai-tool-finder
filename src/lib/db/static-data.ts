@@ -8,7 +8,10 @@
  */
 import { CATEGORIES } from '@/data/categories'
 import { SEED_LISTINGS } from '@/data/seed-listings'
+import { SEED_LISTINGS_EXTRA } from '@/data/seed-listings-extra'
 import type { Category, ListingWithCategory } from './schema'
+
+const ALL_SEED = [...SEED_LISTINGS, ...SEED_LISTINGS_EXTRA]
 import { versusSlug } from '@/lib/slug'
 
 const NOW = Date.now()
@@ -24,7 +27,7 @@ export const STATIC_CATEGORIES: Category[] = CATEGORIES.map((c, i) => ({
 
 const catBySlug = new Map(STATIC_CATEGORIES.map((c) => [c.slug, c]))
 
-export const STATIC_LISTINGS: ListingWithCategory[] = SEED_LISTINGS.map((s, i) => {
+export const STATIC_LISTINGS: ListingWithCategory[] = ALL_SEED.map((s, i) => {
   const category = catBySlug.get(s.categorySlug) ?? null
   return {
     id: i + 1,
