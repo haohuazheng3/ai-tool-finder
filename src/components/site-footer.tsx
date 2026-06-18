@@ -11,7 +11,7 @@ export async function SiteFooter() {
 
   return (
     <footer className="mt-20 border-t bg-muted/30">
-      <div className="container grid gap-10 py-12 md:grid-cols-4">
+      <div className="container grid gap-10 py-12 md:grid-cols-5">
         <div className="md:col-span-1">
           <div className="flex items-center gap-2 font-semibold">
             <span className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -51,9 +51,20 @@ export async function SiteFooter() {
         <div>
           <h3 className="mb-3 text-sm font-semibold">Directory</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><Link href="/match" className="hover:text-foreground">Find your tool</Link></li>
+            <li><Link href="/stacks" className="hover:text-foreground">AI tool stacks</Link></li>
             <li><Link href="/search" className="hover:text-foreground">All AI tools</Link></li>
             <li><Link href="/ai-tools-pricing-report" className="hover:text-foreground">AI pricing index</Link></li>
             <li><Link href="/updates" className="hover:text-foreground">Updates</Link></li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="mb-3 text-sm font-semibold">Company</h3>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><Link href="/guides" className="hover:text-foreground">Guides</Link></li>
+            <li><Link href="/about" className="hover:text-foreground">About &amp; methodology</Link></li>
+            <li><Link href="/contact" className="hover:text-foreground">Contact</Link></li>
             <li><Link href="/submit" className="hover:text-foreground">Submit a tool</Link></li>
             <li><Link href="/advertise" className="hover:text-foreground">Get featured</Link></li>
           </ul>

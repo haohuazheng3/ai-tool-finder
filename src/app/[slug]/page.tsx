@@ -21,7 +21,8 @@ import type { ListingWithCategory } from '@/lib/db/schema'
 import { isActivelyFeatured } from '@/lib/featured'
 import { isVersusSlug, parseVersusSlug, versusSlug } from '@/lib/slug'
 import { breadcrumbLd, buildMetadata, softwareApplicationLd } from '@/lib/seo'
-import { domainFromUrl, logoUrlFor, stripMarkdown, truncate } from '@/lib/utils'
+import { domainFromUrl, formatDate, logoUrlFor, stripMarkdown, truncate } from '@/lib/utils'
+import { startingPrice } from '@/lib/pricing'
 
 export const revalidate = 86400
 
@@ -93,7 +94,9 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
   const featured = isActivelyFeatured(listing)
   const domain = domainFromUrl(listing.websiteUrl)
 
+  const price = startingPrice(listing.pricingText)
   const faqs: Faq[] = [
+    { q: `Is ${listing.name} worth it?`, a: `${listing.name} is worth it if ${(listing.bestFor ?? `you need ${listing.category?.name ?? 'this'}`).replace(/\.$/, '').toLowerCase()}.${listing.notFor ? ` It's not the right pick if ${listing.notFor.replace(/\.$/, '').toLowerCase()}.` : ''}${listing.hasFreeTier ? ' A free tier lets you test it at no cost first.' : price ? ` Paid from about $${price}/mo.` : ''}` },
     { q: `What is ${listing.name}?`, a: `${listing.name} is ${(listing.tagline ?? `an AI ${listing.category?.name ?? 'tool'}`).replace(/\.$/, '')}.${listing.bestFor ? ` It's best for ${listing.bestFor.replace(/\.$/, '').toLowerCase()}.` : ''}` },
     { q: `How much does ${listing.name} cost?`, a: listing.pricingText ?? 'See the official site for current pricing.' },
     { q: `Does ${listing.name} have a free tier?`, a: listing.hasFreeTier ? `Yes, ${listing.name} offers a free tier or free plan.` : `${listing.name} does not offer a permanent free tier; check the site for trials.` },
@@ -253,6 +256,12 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
                 <div className="flex items-center justify-between">
                   <dt className="text-muted-foreground">Category</dt>
                   <dd className="font-medium">{listing.category.name}</dd>
+                </div>
+              )}
+              {listing.updatedAt && (
+                <div className="flex items-center justify-between">
+                  <dt className="text-muted-foreground">Updated</dt>
+                  <dd className="font-medium">{formatDate(listing.updatedAt)}</dd>
                 </div>
               )}
             </dl>

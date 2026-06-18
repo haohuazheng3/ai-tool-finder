@@ -70,6 +70,7 @@ export function softwareApplicationLd(listing: ListingWithCategory) {
     operatingSystem: 'Web',
     url: absoluteUrl(`/${listing.slug}`),
     sameAs: listing.websiteUrl,
+    ...(listing.updatedAt ? { dateModified: new Date(listing.updatedAt).toISOString().slice(0, 10) } : {}),
     ...(offers ? { offers } : {}),
   }
 }
@@ -112,6 +113,33 @@ export function faqPageLd(faqs: { q: string; a: string }[]) {
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a },
     })),
+  }
+}
+
+/** Article/BlogPosting JSON-LD for editorial guides (E-E-A-T: author, dates, publisher). */
+export function articleLd(a: {
+  title: string
+  description: string
+  path: string
+  datePublished: string
+  dateModified: string
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: a.title,
+    description: a.description,
+    datePublished: a.datePublished,
+    dateModified: a.dateModified,
+    author: { '@type': 'Organization', name: `${SITE.name} Editorial`, url: env.appUrl },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE.name,
+      logo: { '@type': 'ImageObject', url: absoluteUrl('/apple-icon') },
+    },
+    mainEntityOfPage: absoluteUrl(a.path),
+    url: absoluteUrl(a.path),
+    image: ogImageUrl(a.title),
   }
 }
 

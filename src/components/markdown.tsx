@@ -9,9 +9,15 @@ export function Markdown({ children, className }: { children: string; className?
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          a: ({ node, ...props }) => (
-            <a {...props} target="_blank" rel="noopener noreferrer" />
-          ),
+          a: ({ node, href, ...props }) => {
+            // Internal links navigate in the same tab (and are crawlable); external open in a new tab.
+            const isInternal = typeof href === 'string' && href.startsWith('/')
+            return isInternal ? (
+              <a href={href} {...props} />
+            ) : (
+              <a href={href} {...props} target="_blank" rel="noopener noreferrer" />
+            )
+          },
         }}
       >
         {children}

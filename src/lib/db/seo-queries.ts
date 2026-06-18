@@ -6,6 +6,7 @@ import { PERSONAS, MIN_PERSONA_TOOLS, getPersona, toolMatchesPersona, type Perso
 import { isActivelyFeatured } from '@/lib/featured'
 import { median, startingPrice } from '@/lib/pricing'
 import { versusSlug } from '@/lib/slug'
+import { getStack, type StackSeed } from '@/data/stacks'
 
 /** All live listings (used by aggregate/grouping queries). */
 async function allLive(): Promise<ListingWithCategory[]> {
@@ -196,6 +197,66 @@ export async function getPricingReport(): Promise<PricingReport> {
 
 export async function getRecentlyAdded(limit = 40): Promise<ListingWithCategory[]> {
   return getListings({ sort: 'newest', limit })
+}
+
+/* ── best/[task]/cheapest (pricing-sorted) ────────────────────────────────── */
+
+export const MIN_CHEAPEST = 3
+
+/** Tools in a category that have a parseable starting price, cheapest first. */
+export async function getCheapestListings(taskSlug: string, limit = 12): Promise<ListingWithCategory[]> {
+  const inCat = await getListings({ categorySlug: taskSlug, limit: 100 })
+  return inCat
+    .map((t) => ({ t, p: startingPrice(t.pricingText) }))
+    .filter((x): x is { t: ListingWithCategory; p: number } => x.p != null)
+    .sort((a, b) => a.p - b.p)
+    .slice(0, limit)
+    .map((x) => x.t)
+}
+
+/* ── /stacks/[outcome] (cross-category cheapest stack) ─────────────────────── */
+
+export type ResolvedStep = {
+  role: string
+  category: string
+  categoryName: string
+  pick: ListingWithCategory | null
+  pickPrice: number | null
+  free: ListingWithCategory | null
+}
+
+export async function getStackResolved(stackSlug: string): Promise<{
+  stack: StackSeed
+  steps: ResolvedStep[]
+  paidTotal: number
+  freeCovered: number
+} | null> {
+  const stack = getStack(stackSlug)
+  if (!stack) return null
+  const steps: ResolvedStep[] = []
+  let paidTotal = 0
+  let freeCovered = 0
+  for (const step of stack.steps) {
+    const inCat = await getListings({ categorySlug: step.category, sort: 'featured', limit: 100 })
+    const priced = inCat
+      .map((t) => ({ t, p: startingPrice(t.pricingText) }))
+      .filter((x): x is { t: ListingWithCategory; p: number } => x.p != null)
+      .sort((a, b) => a.p - b.p)
+    const pick = priced[0]?.t ?? inCat[0] ?? null
+    const pickPrice = pick ? startingPrice(pick.pricingText) : null
+    const free = inCat.filter((t) => t.hasFreeTier).sort(rank)[0] ?? null
+    if (pickPrice) paidTotal += pickPrice
+    if (free) freeCovered++
+    steps.push({
+      role: step.role,
+      category: step.category,
+      categoryName: inCat[0]?.category?.name ?? step.category,
+      pick,
+      pickPrice,
+      free,
+    })
+  }
+  return { stack, steps, paidTotal: Math.round(paidTotal), freeCovered }
 }
 
 export { PERSONAS, getPersona }
