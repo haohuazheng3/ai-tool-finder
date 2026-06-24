@@ -90,6 +90,48 @@ export const PERSONAS: Persona[] = [
     categories: ['ai-writing'],
     match: ['fiction', 'novel', 'story', 'storytelling', 'author', 'creative writing', 'manuscript', 'prose', 'character', 'long-form'],
   },
+  {
+    slug: 'teachers',
+    label: 'Teachers & educators',
+    blurb: 'teachers and educators creating lessons, materials, and feedback',
+    categories: ['ai-writing', 'ai-productivity', 'ai-image', 'ai-assistant', 'ai-data'],
+    match: ['teacher', 'educat', 'student', 'classroom', 'lesson', 'quiz', 'grading', 'curriculum', 'study', 'academic', 'tutor', 'school', 'research', 'summar', 'citation'],
+  },
+  {
+    slug: 'freelancers',
+    label: 'Freelancers',
+    blurb: 'freelancers juggling clients, content, and design on a budget',
+    categories: ['ai-writing', 'ai-design', 'ai-image', 'ai-marketing', 'ai-seo'],
+    match: ['freelance', 'solo', 'client', 'budget', 'affordable', 'small', 'indie', 'portfolio', 'copywriting', 'content', 'social', 'brand'],
+  },
+  {
+    slug: 'startups',
+    label: 'Startups & founders',
+    blurb: 'startup founders shipping fast across product, marketing, and design',
+    categories: ['ai-coding', 'ai-marketing', 'ai-writing', 'ai-design', 'ai-assistant'],
+    match: ['startup', 'founder', 'mvp', 'launch', 'indie', 'build', 'ship', 'growth', 'small business', 'scale', 'developer', 'app'],
+  },
+  {
+    slug: 'real-estate-agents',
+    label: 'Real estate agents',
+    blurb: 'real estate agents writing listings, ads, and marketing visuals',
+    categories: ['ai-writing', 'ai-marketing', 'ai-image'],
+    match: ['real estate', 'listing', 'property', 'agent', 'description', 'ad', 'marketing', 'social', 'copywriting', 'photo', 'campaign'],
+  },
+  {
+    slug: 'nonprofits',
+    label: 'Nonprofits',
+    blurb: 'nonprofit teams doing more with less across comms and fundraising',
+    categories: ['ai-writing', 'ai-marketing', 'ai-design'],
+    match: ['nonprofit', 'grant', 'fundrais', 'donor', 'campaign', 'content', 'social', 'community', 'budget', 'affordable', 'email', 'outreach'],
+  },
+  {
+    slug: 'researchers',
+    label: 'Researchers & academics',
+    blurb: 'researchers and academics reviewing literature and analyzing data',
+    categories: ['ai-data', 'ai-writing', 'ai-assistant'],
+    match: ['research', 'academic', 'paper', 'citation', 'literature', 'study', 'data', 'analy', 'science', 'phd', 'thesis', 'summar', 'insight'],
+  },
 ]
 
 export const PERSONA_SLUGS = PERSONAS.map((p) => p.slug)
