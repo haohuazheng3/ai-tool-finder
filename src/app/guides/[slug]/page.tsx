@@ -9,6 +9,8 @@ import { GUIDES, GUIDE_SLUGS, getGuide } from '@/data/guides'
 import { formatDate } from '@/lib/utils'
 import { articleLd, breadcrumbLd, buildMetadata } from '@/lib/seo'
 import { SITE } from '@/lib/constants'
+import { HeroImage } from '@/components/hero-image'
+import { HERO_IMAGES } from '@/data/hero-images'
 
 export const revalidate = 86400
 
@@ -63,6 +65,8 @@ export default function GuidePage({ params }: { params: { slug: string } }) {
         <span className="flex items-center gap-1.5"><CalendarClock className="size-3.5" /> Updated {formatDate(g.updatedAt)}</span>
         <span>{g.readMins} min read</span>
       </div>
+
+      <HeroImage hero={HERO_IMAGES['g:' + g.slug]} />
 
       <div className="mt-6">
         <Markdown>{g.bodyMd}</Markdown>

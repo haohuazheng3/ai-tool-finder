@@ -16,6 +16,8 @@ import { getQualifyingPersonaPairs, trioSlug } from '@/lib/db/seo-queries'
 import { isActivelyFeatured } from '@/lib/featured'
 import { breadcrumbLd, buildMetadata, itemListLd } from '@/lib/seo'
 import { logoUrlFor } from '@/lib/utils'
+import { HeroImage } from '@/components/hero-image'
+import { HERO_IMAGES } from '@/data/hero-images'
 
 export const revalidate = 86400
 
@@ -95,7 +97,9 @@ export default async function BestPage({ params }: { params: { task: string } })
         <span className="text-foreground">Best</span>
       </nav>
 
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{headline} (2026)</h1>
+      <HeroImage hero={HERO_IMAGES[params.task]} />
+
+      <h1 className="mt-5 text-3xl font-bold tracking-tight sm:text-4xl">{headline} (2026)</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
         We ranked {listings.length || 'the top'} {category.name.toLowerCase()} tools by capability,
         value, and fit. Sponsored partners are marked — ranking still reflects what each tool is
