@@ -3,6 +3,7 @@ import { CATEGORY_SLUGS } from '@/data/categories'
 import { getCategories, getAllListingSlugs, getComparePairs } from '@/lib/db/queries'
 import {
   getCompareTrios,
+  getPricingPageSlugs,
   getQualifyingPersonaPairs,
   getSlugsWithAlternatives,
 } from '@/lib/db/seo-queries'
@@ -16,13 +17,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = env.appUrl
   const now = new Date()
 
-  const [listingSlugs, comparePairs, categories, personaPairs, altSlugs, trios] = await Promise.all([
+  const [listingSlugs, comparePairs, categories, personaPairs, altSlugs, trios, pricingSlugs] = await Promise.all([
     getAllListingSlugs(),
     getComparePairs(4),
     getCategories(),
     getQualifyingPersonaPairs(),
     getSlugsWithAlternatives(),
     getCompareTrios(4),
+    getPricingPageSlugs(),
   ])
   const catSlugs = categories.length ? categories.map((c) => c.slug) : CATEGORY_SLUGS
 
@@ -51,6 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...personaPairs.map((p) => e(`${base}/best/${p.task}/for/${p.persona}`, 0.8, 'weekly')),
     ...listingSlugs.map((s) => e(`${base}/${s}`, 0.7, 'weekly')),
     ...altSlugs.map((s) => e(`${base}/${s}/alternatives`, 0.8, 'weekly')),
+    ...pricingSlugs.map((s) => e(`${base}/${s}/pricing`, 0.7, 'monthly')),
     ...trios.map((s) => e(`${base}/compare/${s}`, 0.6, 'monthly')),
     ...comparePairs.map((s) => e(`${base}/${s}`, 0.6, 'monthly')),
     ...STACK_SLUGS.map((s) => e(`${base}/stacks/${s}`, 0.7, 'weekly')),

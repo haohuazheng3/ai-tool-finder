@@ -114,6 +114,9 @@ export default async function BestPage({ params }: { params: { task: string } })
         <Link href={`/best/${params.task}/free`} className="rounded-full border px-3 py-1 hover:bg-accent">
           Best free {shortName}
         </Link>
+        <Link href={`/best/${params.task}/cheapest`} className="rounded-full border px-3 py-1 hover:bg-accent">
+          Cheapest {shortName}
+        </Link>
         {personaSlugs.map((ps) => {
           const p = getPersona(ps)
           return p ? (

@@ -43,7 +43,7 @@ export async function generateMetadata({
       160,
     )
     return buildMetadata({
-      title: `${listing.name} — Review, Pricing & Alternatives`,
+      title: `${listing.name} Review (2026): Features, Pros & Cons`,
       description,
       path: `/${listing.slug}`,
       ogSubtitle: listing.tagline ?? undefined,
@@ -173,6 +173,14 @@ async function ListingDetail({ listing }: { listing: ListingWithCategory }) {
             {listing.bestFor ? ` Best for ${listing.bestFor.replace(/\.$/, '').toLowerCase()}.` : ''}{' '}
             {listing.pricingText ? `Pricing: ${listing.pricingText}.` : ''} {listing.hasFreeTier ? 'A free tier is available.' : ''}
           </AnswerCapsule>
+
+          {(price != null || listing.hasFreeTier) && (
+            <p className="mt-3 text-sm">
+              <Link href={`/${listing.slug}/pricing`} className="font-medium text-primary hover:underline">
+                See {listing.name} pricing, plans &amp; free tier →
+              </Link>
+            </p>
+          )}
 
           {listing.descriptionMd && (
             <section className="mt-8">

@@ -203,6 +203,12 @@ export async function getRecentlyAdded(limit = 40): Promise<ListingWithCategory[
 
 export const MIN_CHEAPEST = 3
 
+/** Tools that warrant a dedicated /[slug]/pricing page (have a real price or a free tier). */
+export async function getPricingPageSlugs(): Promise<string[]> {
+  const live = await allLive()
+  return live.filter((l) => startingPrice(l.pricingText) != null || l.hasFreeTier).map((l) => l.slug)
+}
+
 /** Tools in a category that have a parseable starting price, cheapest first. */
 export async function getCheapestListings(taskSlug: string, limit = 12): Promise<ListingWithCategory[]> {
   const inCat = await getListings({ categorySlug: taskSlug, limit: 100 })

@@ -26,6 +26,15 @@ export function freeTierLabel(t: { hasFreeTier: boolean; pricingText?: string | 
   return 'Free tier'
 }
 
+/** Split free-text pricing into readable plan lines for a dedicated pricing page. */
+export function parsePlans(pricingText?: string | null): string[] {
+  if (!pricingText) return []
+  return pricingText
+    .split(/[;,]|(?: and )/i)
+    .map((s) => s.trim().replace(/^[-–•]\s*/, ''))
+    .filter((s) => s.length > 2)
+}
+
 export function median(nums: number[]): number | null {
   if (!nums.length) return null
   const s = [...nums].sort((a, b) => a - b)
