@@ -41,6 +41,14 @@ export const env = {
 
 export const isDatabaseConfigured = () => Boolean(env.databaseUrl)
 
+/**
+ * Cost mode: when SEO_STATIC_READS=1, public READ queries serve from the bundled
+ * seed dataset instead of querying Neon — eliminating Neon egress ("public transfer")
+ * on both build (generateStaticParams + page data) and runtime revalidation. Writes
+ * (clicks, submissions, Stripe-featured) still go to Neon. Leave unset to read live DB.
+ */
+export const preferStaticReads = () => process.env.SEO_STATIC_READS === '1'
+
 export const isClerkConfigured = () =>
   Boolean(env.clerkPublishableKey) && Boolean(env.clerkSecretKey)
 

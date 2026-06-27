@@ -9,7 +9,7 @@ import {
   type Category,
   type ListingWithCategory,
 } from './schema'
-import { isDatabaseConfigured } from '@/lib/env'
+import { isDatabaseConfigured, preferStaticReads } from '@/lib/env'
 import { versusSlug } from '@/lib/slug'
 import {
   STATIC_CATEGORIES,
@@ -29,6 +29,13 @@ const activeFeatured = sql<boolean>`(${listings.featured} = true and (${listings
 
 type Row = { listings: typeof listings.$inferSelect; categories: Category | null }
 const mapRow = (r: Row): ListingWithCategory => ({ ...r.listings, category: r.categories ?? null })
+
+/**
+ * Serve READS from the bundled static dataset when DATABASE_URL is absent OR
+ * SEO_STATIC_READS=1 (cost mode — zero Neon egress on build + runtime reads).
+ * Write paths (recordClick) intentionally bypass this and still require the DB.
+ */
+const useStatic = () => !isDatabaseConfigured() || preferStaticReads()
 
 export type ListingSort = 'featured' | 'newest' | 'name' | 'free'
 export type ListingStatusFilter = 'live' | 'pending' | 'rejected' | 'all'
@@ -64,7 +71,7 @@ function buildOrderBy(sort: ListingSort) {
 
 /** Core listing query used by every public page. Returns listings + category. */
 export async function getListings(filters: ListingFilters = {}): Promise<ListingWithCategory[]> {
-  if (!isDatabaseConfigured()) return staticGetListings(filters)
+  if (useStatic()) return staticGetListings(filters)
   const {
     categorySlug,
     tag,
@@ -111,7 +118,7 @@ export async function getListings(filters: ListingFilters = {}): Promise<Listing
 }
 
 export async function getFeaturedListings(limit = 6): Promise<ListingWithCategory[]> {
-  if (!isDatabaseConfigured()) return staticGetFeatured(limit)
+  if (useStatic()) return staticGetFeatured(limit)
   try {
     const rows = await db
       .select({ listings, categories })
@@ -132,7 +139,7 @@ export async function getLatestListings(limit = 8): Promise<ListingWithCategory[
 }
 
 export async function getListingBySlug(slug: string): Promise<ListingWithCategory | null> {
-  if (!isDatabaseConfigured()) return staticGetBySlug(slug)
+  if (useStatic()) return staticGetBySlug(slug)
   try {
     const rows = await db
       .select({ listings, categories })
@@ -152,7 +159,7 @@ export async function getRelatedListings(
   listing: ListingWithCategory,
   limit = 4,
 ): Promise<ListingWithCategory[]> {
-  if (!isDatabaseConfigured()) return staticGetRelated(listing, limit)
+  if (useStatic()) return staticGetRelated(listing, limit)
   if (!listing.categoryId) return []
   try {
     const rows = await db
@@ -176,7 +183,7 @@ export async function getRelatedListings(
 }
 
 export async function getCategories(): Promise<Category[]> {
-  if (!isDatabaseConfigured()) return STATIC_CATEGORIES
+  if (useStatic()) return STATIC_CATEGORIES
   try {
     return await db.select().from(categories).orderBy(asc(categories.sortOrder), asc(categories.name))
   } catch (err) {
@@ -186,7 +193,7 @@ export async function getCategories(): Promise<Category[]> {
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  if (!isDatabaseConfigured()) return staticGetCategoryBySlug(slug)
+  if (useStatic()) return staticGetCategoryBySlug(slug)
   try {
     const rows = await db.select().from(categories).where(eq(categories.slug, slug)).limit(1)
     return rows[0] ?? null
@@ -198,7 +205,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
 
 /** Categories annotated with their live listing count (for the home grid). */
 export async function getCategoriesWithCounts(): Promise<(Category & { count: number })[]> {
-  if (!isDatabaseConfigured()) return staticGetCategoriesWithCounts()
+  if (useStatic()) return staticGetCategoriesWithCounts()
   try {
     const rows = await db
       .select({
@@ -220,7 +227,7 @@ export async function getCategoriesWithCounts(): Promise<(Category & { count: nu
 }
 
 export async function getAllListingSlugs(): Promise<string[]> {
-  if (!isDatabaseConfigured()) return staticGetAllSlugs()
+  if (useStatic()) return staticGetAllSlugs()
   try {
     const rows = await db
       .select({ slug: listings.slug })
@@ -238,7 +245,7 @@ export async function getAllListingSlugs(): Promise<string[]> {
  * pre-render valuable "X vs Y" pages for SEO).
  */
 export async function getComparePairs(perCategory = 4): Promise<string[]> {
-  if (!isDatabaseConfigured()) return staticGetComparePairs(perCategory)
+  if (useStatic()) return staticGetComparePairs(perCategory)
   try {
     const rows = await db
       .select({ slug: listings.slug, categoryId: listings.categoryId })
@@ -290,7 +297,7 @@ export async function recordClick(listingId: number, ref?: string | null): Promi
 export async function getListingForRedirect(
   id: number,
 ): Promise<{ id: number; affiliateUrl: string | null; websiteUrl: string } | null> {
-  if (!isDatabaseConfigured()) return staticGetForRedirect(id)
+  if (useStatic()) return staticGetForRedirect(id)
   try {
     const rows = await db
       .select({

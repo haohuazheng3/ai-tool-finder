@@ -9,9 +9,10 @@
 import { CATEGORIES } from '@/data/categories'
 import { SEED_LISTINGS } from '@/data/seed-listings'
 import { SEED_LISTINGS_EXTRA } from '@/data/seed-listings-extra'
+import { SEED_LISTINGS_EXTRA_2 } from '@/data/seed-listings-extra-2'
 import type { Category, ListingWithCategory } from './schema'
 
-const ALL_SEED = [...SEED_LISTINGS, ...SEED_LISTINGS_EXTRA]
+const ALL_SEED = [...SEED_LISTINGS, ...SEED_LISTINGS_EXTRA, ...SEED_LISTINGS_EXTRA_2]
 import { versusSlug } from '@/lib/slug'
 
 const NOW = Date.now()
